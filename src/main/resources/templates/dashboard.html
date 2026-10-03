@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="pt-br" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bit Soluções - Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .btn-blue { background-color: #2563eb; color: #ffffff; border: none; }
+        .btn-blue:hover { background-color: #1d4ed8; color: #ffffff; }
+        .btn-outline-blue { border-color: #2563eb; color: #2563eb; }
+        .btn-outline-blue:hover { background-color: #2563eb; color: #ffffff; }
+        .text-blue { color: #2563eb !important; }
+        .border-blue { border-color: #2563eb !important; }
+    </style>
+    <script>
+        const getStoredTheme = () => localStorage.getItem('theme');
+        const setStoredTheme = theme => localStorage.setItem('theme', theme);
+        const getPreferredTheme = () => {
+            const storedTheme = getStoredTheme();
+            if (storedTheme) return storedTheme;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+        const setTheme = theme => document.documentElement.setAttribute('data-bs-theme', theme);
+        setTheme(getPreferredTheme());
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('themeToggle');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    setStoredTheme(newTheme);
+                    setTheme(newTheme);
+                });
+            }
+        });
+    </script>
+</head>
+<body class="min-vh-100 d-flex flex-column">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg border-bottom border-blue bg-body-tertiary">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3 text-blue" th:href="@{/}">
+            <i class="bi bi-headset me-2"></i>bit Soluções
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            <a th:href="@{/tickets}" class="btn btn-outline-blue btn-sm">
+                <i class="bi bi-list-task me-1"></i> Solicitações
+            </a>
+
+            <!-- Botão Modo Noturno / Claro -->
+            <button id="themeToggle" class="btn btn-outline-secondary btn-sm" title="Alternar Modo Noturno/Claro">
+                <i class="bi bi-moon-stars-fill"></i>
+            </button>
+
+            <span class="small text-body-secondary">
+                    <i class="bi bi-person-circle text-blue me-1"></i>
+                    <strong sec:authentication="name">Usuário</strong>
+                </span>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 text-blue me-2"></i>Dashboard de Indicadores</h2>
+            <p class="text-body-secondary m-0">Visão geral do volume de demandas internas</p>
+        </div>
+        <a th:href="@{/tickets/add}" class="btn btn-blue shadow">
+            <i class="bi bi-plus-circle-fill me-1"></i> Nova Solicitação
+        </a>
+    </div>
+
+    <!-- Indicadores Cards -->
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card border-blue p-3 shadow-sm rounded-4 bg-body-tertiary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-body-secondary small text-uppercase">Total</span>
+                        <h2 class="fw-bold m-0 text-blue" th:text="${totalTickets}">0</h2>
+                    </div>
+                    <i class="bi bi-folder-fill text-blue display-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-warning p-3 shadow-sm rounded-4 bg-body-tertiary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-warning small text-uppercase">Abertas</span>
+                        <h2 class="fw-bold m-0 text-warning" th:text="${openTickets}">0</h2>
+                    </div>
+                    <i class="bi bi-exclamation-circle-fill text-warning display-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-info p-3 shadow-sm rounded-4 bg-body-tertiary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-info small text-uppercase">Em Atendimento</span>
+                        <h2 class="fw-bold m-0 text-info" th:text="${inProgressTickets}">0</h2>
+                    </div>
+                    <i class="bi bi-gear-wide-connected text-info display-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-success p-3 shadow-sm rounded-4 bg-body-tertiary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-success small text-uppercase">Concluídas</span>
+                        <h2 class="fw-bold m-0 text-success" th:text="${completedTickets}">0</h2>
+                    </div>
+                    <i class="bi bi-check-circle-fill text-success display-5"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center text-body-secondary py-3 mt-auto border-top">
+    <small>&copy; 2026 bit Soluções - Portal de Solicitações Internas</small>
+</footer>
+
+</body>
+</html>

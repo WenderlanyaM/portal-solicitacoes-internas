@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bit Soluções - Editar Solicitação</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .btn-pastel-blue { background-color: #93c5fd; color: #1e3a8a; border: none; font-weight: 600; }
+        .btn-pastel-blue:hover { background-color: #60a5fa; color: #1e3a8a; }
+        .text-blue { color: #2563eb !important; }
+        .border-blue { border-color: #2563eb !important; }
+    </style>
+    <script>
+        const getStoredTheme = () => localStorage.getItem('theme');
+        const setStoredTheme = theme => localStorage.setItem('theme', theme);
+        const getPreferredTheme = () => {
+            const storedTheme = getStoredTheme();
+            if (storedTheme) return storedTheme;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+        const setTheme = theme => document.documentElement.setAttribute('data-bs-theme', theme);
+        setTheme(getPreferredTheme());
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('themeToggle');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    setStoredTheme(newTheme);
+                    setTheme(newTheme);
+                });
+            }
+        });
+    </script>
+</head>
+<body class="min-vh-100 d-flex flex-column">
+
+<nav class="navbar border-bottom border-blue bg-body-tertiary">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3 text-blue" th:href="@{/}">
+            <i class="bi bi-headset me-2"></i>bit Soluções
+        </a>
+        <button id="themeToggle" class="btn btn-outline-secondary btn-sm" title="Alternar Modo Noturno/Claro">
+            <i class="bi bi-moon-stars-fill"></i>
+        </button>
+    </div>
+</nav>
+
+<div class="container my-auto py-5" style="max-width: 650px;">
+    <div class="card border-blue shadow-lg rounded-4 p-4 bg-body-tertiary">
+        <h3 class="fw-bold mb-3 text-blue">
+            <i class="bi bi-pencil-square me-2"></i>Editar Solicitação #<span th:text="${ticket.id}"></span>
+        </h3>
+        <p class="text-body-secondary mb-4">Apenas solicitações com status ABERTO podem ser editadas.</p>
+
+        <form th:action="@{/tickets/edit/{id}(id=${ticket.id})}" th:object="${ticket}" method="post">
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input type="text" th:field="*{title}" class="form-control" />
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Categoria</label>
+                <select th:field="*{category}" class="form-select">
+                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                </select>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Descrição Detalhada</label>
+                <textarea th:field="*{description}" rows="4" class="form-control"></textarea>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-pastel-blue w-100 py-2">
+                    <i class="bi bi-arrow-repeat me-1"></i> Atualizar Solicitação
+                </button>
+                <a th:href="@{/tickets}" class="btn btn-outline-secondary w-100 py-2">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: db_portal
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - vol_portal_dados:/var/lib/mysql
+
+volumes:
+  vol_portal_dados:
